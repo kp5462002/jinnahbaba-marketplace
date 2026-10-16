@@ -1,0 +1,403 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ───────────────────────────────────────────────────────────────────
+
+enum Role {
+  BUYER
+  SUPPLIER
+  ADMIN
+}
+
+enum BusinessType {
+  MANUFACTURER
+  TRADING_COMPANY
+  DISTRIBUTOR
+  WHOLESALER
+  RETAILER
+  AGENT
+}
+
+enum ProductStatus {
+  DRAFT
+  PENDING
+  ACTIVE
+  REJECTED
+  ARCHIVED
+}
+
+enum InquiryStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  EXPIRED
+}
+
+enum RFQStatus {
+  OPEN
+  CLOSED
+  EXPIRED
+  CANCELLED
+}
+
+enum RFQResponseStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  WITHDRAWN
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  DISPUTED
+}
+
+enum CartStatus {
+  ACTIVE
+  CHECKED_OUT
+  ABANDONED
+}
+
+enum AddressType {
+  SHIPPING
+  BILLING
+  BOTH
+}
+
+// ─── Models ──────────────────────────────────────────────────────────────────
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(BUYER)
+
+  // Contact
+  contactName  String?
+  phone        String?
+  country      String?
+  city         String?
+
+  // Company (mainly for suppliers, but buyers can fill too)
+  companyName  String?
+  companySlug  String?  @unique
+  businessType BusinessType?
+  description  String?  @db.Text
+  logoUrl      String?
+  bannerUrl    String?
+  yearEstablished Int?
+  website      String?
+
+  // Supplier stats
+  responseRate     Float @default(0)
+  responseTimeHours Int  @default(24)
+  rating           Float @default(0)
+  reviewCount      Int   @default(0)
+  totalTransactions Int  @default(0)
+
+  // Verification / status
+  isVerified Boolean @default(false)
+  isActive   Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  products          Product[]
+  addresses         Address[]
+  carts             Cart[]
+  inquiriesSent     Inquiry[]      @relation("BuyerInquiries")
+  inquiriesReceived Inquiry[]      @relation("SupplierInquiries")
+  rfqsPosted        RFQ[]          @relation("BuyerRFQs")
+  rfqResponses      RFQResponse[]  @relation("SupplierRFQResponses")
+  reviewsWritten    Review[]       @relation("ReviewAuthor")
+  reviewsReceived   Review[]       @relation("ReviewTarget")
+  ordersAsBuyer     Order[]        @relation("BuyerOrders")
+  ordersAsSupplier  Order[]        @relation("SupplierOrders")
+  messages          Message[]
+
+  @@index([role])
+  @@index([country])
+  @@index([isVerified])
+  @@map("users")
+}
+
+model Address {
+  id         String      @id @default(cuid())
+  userId     String
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label      String?
+  fullName   String
+  phone      String
+  line1      String
+  line2      String?
+  city       String
+  state      String?
+  postalCode String
+  country    String
+  type       AddressType @default(SHIPPING)
+  isDefault  Boolean     @default(false)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  @@index([userId])
+  @@map("addresses")
+}
+
+model Category {
+  id        String     @id @default(cuid())
+  name      String
+  slug      String     @unique
+  iconUrl   String?
+  parentId  String?
+  parent    Category?  @relation("CategoryTree", fields: [parentId], references: [id])
+  children  Category[] @relation("CategoryTree")
+  products  Product[]
+  sortOrder Int        @default(0)
+  createdAt DateTime   @default(now())
+
+  @@index([parentId])
+  @@map("categories")
+}
+
+model Product {
+  id          String        @id @default(cuid())
+  supplierId  String
+  supplier    User          @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  categoryId  String
+  category    Category      @relation(fields: [categoryId], references: [id])
+
+  title       String
+  slug        String        @unique
+  description String        @db.Text
+  shortDesc   String?
+
+  // Pricing
+  priceMin    Float
+  priceMax    Float
+  currency    String        @default("USD")
+  unit        String        @default("piece")
+
+  // Trade info
+  minOrderQty Int           @default(1)
+  stockQty    Int           @default(0)
+  leadTimeDays Int          @default(15)
+  portOfDispatch String?
+  paymentTerms   String?
+  supplyAbility  String?
+
+  // Metadata
+  status      ProductStatus @default(DRAFT)
+  tags        String[]      @default([])
+  viewCount   Int           @default(0)
+  inquiryCount Int          @default(0)
+  rating      Float         @default(0)
+  reviewCount Int           @default(0)
+  isFeatured  Boolean       @default(false)
+
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  // Relations
+  images      ProductImage[]
+  inquiries   Inquiry[]
+  orders      Order[]
+  cartItems   CartItem[]
+  reviews     Review[]
+
+  @@index([categoryId])
+  @@index([supplierId])
+  @@index([status])
+  @@index([isFeatured])
+  @@index([slug])
+  @@map("products")
+}
+
+model ProductImage {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url       String
+  altText   String?
+  sortOrder Int      @default(0)
+  isPrimary Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([productId])
+  @@map("product_images")
+}
+
+model Cart {
+  id        String     @id @default(cuid())
+  userId    String
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status    CartStatus @default(ACTIVE)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  items     CartItem[]
+
+  @@index([userId])
+  @@index([status])
+  @@map("carts")
+}
+
+model CartItem {
+  id        String   @id @default(cuid())
+  cartId    String
+  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  quantity  Int      @default(1)
+  createdAt DateTime @default(now())
+
+  @@unique([cartId, productId])
+  @@index([cartId])
+  @@index([productId])
+  @@map("cart_items")
+}
+
+model Inquiry {
+  id         String        @id @default(cuid())
+  buyerId    String
+  buyer      User          @relation("BuyerInquiries", fields: [buyerId], references: [id], onDelete: Cascade)
+  productId  String
+  product    Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
+  supplierId String
+  supplier   User          @relation("SupplierInquiries", fields: [supplierId], references: [id], onDelete: Cascade)
+  message    String        @db.Text
+  quantity   Int?
+  status     InquiryStatus @default(PENDING)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  order      Order?
+
+  @@index([buyerId])
+  @@index([supplierId])
+  @@index([productId])
+  @@map("inquiries")
+}
+
+model RFQ {
+  id           String     @id @default(cuid())
+  buyerId      String
+  buyer        User       @relation("BuyerRFQs", fields: [buyerId], references: [id], onDelete: Cascade)
+  title        String
+  description  String     @db.Text
+  categoryId   String?
+  quantity     Int
+  unit         String     @default("piece")
+  targetPrice  Float?
+  currency     String     @default("USD")
+  deliveryDate DateTime?
+  destination  String?
+  attachments  String[]   @default([])
+  status       RFQStatus  @default(OPEN)
+  expiresAt    DateTime?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  responses    RFQResponse[]
+
+  @@index([buyerId])
+  @@index([status])
+  @@index([categoryId])
+  @@map("rfqs")
+}
+
+model RFQResponse {
+  id          String            @id @default(cuid())
+  rfqId       String
+  rfq         RFQ               @relation(fields: [rfqId], references: [id], onDelete: Cascade)
+  supplierId  String
+  supplier    User              @relation("SupplierRFQResponses", fields: [supplierId], references: [id], onDelete: Cascade)
+  unitPrice   Float
+  currency    String            @default("USD")
+  minOrderQty Int
+  leadTimeDays Int
+  message     String?           @db.Text
+  status      RFQResponseStatus @default(PENDING)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@index([rfqId])
+  @@index([supplierId])
+  @@map("rfq_responses")
+}
+
+model Review {
+  id         String   @id @default(cuid())
+  productId  String?
+  product    Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  authorId   String
+  author     User     @relation("ReviewAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  targetId   String
+  target     User     @relation("ReviewTarget", fields: [targetId], references: [id], onDelete: Cascade)
+  orderId    String?
+  rating     Int      @default(5)
+  title      String?
+  comment    String   @db.Text
+  isVerified Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  @@index([productId])
+  @@index([authorId])
+  @@index([targetId])
+  @@map("reviews")
+}
+
+model Order {
+  id          String      @id @default(cuid())
+  orderNumber String      @unique
+  buyerId     String
+  buyer       User        @relation("BuyerOrders", fields: [buyerId], references: [id], onDelete: Cascade)
+  supplierId  String
+  supplier    User        @relation("SupplierOrders", fields: [supplierId], references: [id], onDelete: Cascade)
+  productId   String
+  product     Product     @relation(fields: [productId], references: [id])
+  inquiryId   String?     @unique
+  inquiry     Inquiry?    @relation(fields: [inquiryId], references: [id])
+  quantity    Int
+  unitPrice   Float
+  totalAmount Float
+  currency    String      @default("USD")
+  status      OrderStatus @default(PENDING)
+  shippingAddress String? @db.Text
+  notes       String?     @db.Text
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  messages    Message[]
+
+  @@index([buyerId])
+  @@index([supplierId])
+  @@index([status])
+  @@map("orders")
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  senderId  String
+  sender    User     @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  content   String   @db.Text
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([orderId])
+  @@index([senderId])
+  @@map("messages")
+}

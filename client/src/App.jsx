@@ -7,6 +7,8 @@ import ProductDetail from './pages/ProductDetail.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
+import RFQList from './pages/RFQList.jsx';
+import RFQCreate from './pages/RFQCreate.jsx';
 
 export default function App() {
   return (
@@ -18,6 +20,9 @@ export default function App() {
         <Route path="/products/:id" element={<ProductDetail />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/rfq" element={<RFQList />} />
+        <Route path="/rfq/new" element={<RFQCreate />} />
+        <Route path="/rfq/:id" element={<RFQList />} />
         <Route
           path="/dashboard"
           element={

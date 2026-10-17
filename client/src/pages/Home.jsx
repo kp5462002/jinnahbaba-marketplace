@@ -27,9 +27,9 @@ export default function Home() {
               <div className="w-[300px] bg-white rounded-lg p-5 border hidden md:block">
                 <h3 className="font-bold">Start your order</h3>
                 <p className="text-xs text-gray-600 mt-1">Trade with confidence</p>
-                <button className="w-full bg-[#00A651] hover:bg-[#008a44] text-white py-2.5 rounded-full mt-4 text-sm font-semibold transition">
+                <Link to="/rfq/new" className="block w-full text-center bg-[#00A651] hover:bg-[#008a44] text-white py-2.5 rounded-full mt-4 text-sm font-semibold transition">
                   Post a Request
-                </button>
+                </Link>
                 <p className="text-[11px] text-gray-400 mt-2 text-center">Get quotes from suppliers</p>
               </div>
             </div>

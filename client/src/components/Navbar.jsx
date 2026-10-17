@@ -2,14 +2,15 @@ import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import logoWhite from "../assets/logo-white.png";
 import { useAuth } from "../context/AuthContext.jsx";
+import { useCart } from "../context/CartContext.jsx";
 
 const Navbar = () => {
   const { user, logout } = useAuth();
+  const { itemCount } = useCart();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClick = (e) => {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
@@ -31,7 +32,6 @@ const Navbar = () => {
 
   return (
     <header className="bg-[#00A651] text-white">
-      {/* TOP ROW */}
       <div className="flex justify-between items-center px-8 py-4">
         <Link to="/">
           <img src={logoWhite} alt="Jinnahbaba.com" className="h-20 w-auto object-contain" />
@@ -51,7 +51,18 @@ const Navbar = () => {
           </div>
 
           <div className="flex items-center gap-5 ml-4 text-xl">
-            <span className="cursor-pointer" title="Cart">🛒</span>
+            <Link
+              to="/cart"
+              className="relative cursor-pointer hover:opacity-80 transition"
+              title="Cart"
+            >
+              🛒
+              {itemCount > 0 && (
+                <span className="absolute -top-1 -right-2 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+                  {itemCount > 99 ? '99+' : itemCount}
+                </span>
+              )}
+            </Link>
             <span className="cursor-pointer" title="Messages">💬</span>
             <span className="cursor-pointer" title="Orders">📋</span>
           </div>
@@ -74,9 +85,7 @@ const Navbar = () => {
                   <div className="px-4 py-3 border-b">
                     <div className="text-xs text-gray-500">Signed in as</div>
                     <div className="text-sm font-semibold truncate">{user.email}</div>
-                    <div className="text-[11px] text-gray-500 mt-1">
-                      Role: {user.role}
-                    </div>
+                    <div className="text-[11px] text-gray-500 mt-1">Role: {user.role}</div>
                   </div>
 
                   <Link
@@ -87,18 +96,18 @@ const Navbar = () => {
                     📊 My Dashboard
                   </Link>
                   <Link
-                    to="/dashboard"
+                    to="/cart"
                     onClick={() => setMenuOpen(false)}
                     className="block px-4 py-2 text-sm hover:bg-gray-50"
                   >
-                    🛒 My Orders
+                    🛒 My Cart {itemCount > 0 && `(${itemCount})`}
                   </Link>
                   <Link
-                    to="/dashboard"
+                    to="/rfq"
                     onClick={() => setMenuOpen(false)}
                     className="block px-4 py-2 text-sm hover:bg-gray-50"
                   >
-                    💬 Inquiries
+                    💬 My RFQs
                   </Link>
 
                   <div className="border-t">
@@ -120,7 +129,6 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* SECOND ROW */}
       <div className="flex justify-between items-center px-8 pb-3 text-[13px] border-t border-white/10 pt-3">
         <div className="flex items-center gap-6">
           <span className="font-bold cursor-pointer">☰ All categories</span>

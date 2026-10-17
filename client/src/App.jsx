@@ -10,6 +10,7 @@ import Register from './pages/Register.jsx';
 import RFQList from './pages/RFQList.jsx';
 import RFQCreate from './pages/RFQCreate.jsx';
 import SupplierProfile from './pages/SupplierProfile.jsx';
+import Cart from './pages/Cart.jsx';
 
 export default function App() {
   return (
@@ -25,6 +26,7 @@ export default function App() {
         <Route path="/rfq/new" element={<RFQCreate />} />
         <Route path="/rfq/:id" element={<RFQList />} />
         <Route path="/suppliers/:id" element={<SupplierProfile />} />
+        <Route path="/cart" element={<Cart />} />
         <Route
           path="/dashboard"
           element={

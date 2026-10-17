@@ -10,6 +10,7 @@ export default function ProductListing() {
   const [error, setError] = useState(null);
 
   const categorySlug = searchParams.get('category') || '';
+  const supplierId = searchParams.get('supplierId') || '';
   const searchQuery = searchParams.get('search') || '';
   const sortBy = searchParams.get('sort') || 'createdAt';
   const sortOrder = searchParams.get('order') || 'desc';
@@ -31,6 +32,7 @@ export default function ProductListing() {
         const params = new URLSearchParams();
         if (categorySlug) params.set('categorySlug', categorySlug);
         if (searchQuery) params.set('search', searchQuery);
+        if (supplierId) params.set('supplierId', supplierId);
         params.set('page', String(page));
         params.set('limit', '20');
         params.set('sortBy', sortBy);

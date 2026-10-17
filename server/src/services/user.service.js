@@ -192,3 +192,48 @@ export async function deleteUser(id) {
   await prisma.user.delete({ where: { id } });
   return { message: 'User deleted' };
 }
+
+export async function getPublicSupplierProfile(id) {
+  const user = await prisma.user.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      role: true,
+      companyName: true,
+      companySlug: true,
+      contactName: true,
+      country: true,
+      city: true,
+      businessType: true,
+      description: true,
+      logoUrl: true,
+      bannerUrl: true,
+      yearEstablished: true,
+      website: true,
+      isVerified: true,
+      rating: true,
+      reviewCount: true,
+      responseRate: true,
+      responseTimeHours: true,
+      totalTransactions: true,
+      createdAt: true,
+      _count: {
+        select: { products: true },
+      },
+    },
+  });
+
+  if (!user) {
+    const err = new Error('Supplier not found');
+    err.status = 404;
+    throw err;
+  }
+
+  if (user.role !== 'SUPPLIER' && user.role !== 'ADMIN') {
+    const err = new Error('This user is not a supplier');
+    err.status = 400;
+    throw err;
+  }
+
+  return user;
+}

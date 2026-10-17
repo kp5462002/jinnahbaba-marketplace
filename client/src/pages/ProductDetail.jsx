@@ -195,7 +195,7 @@ export default function ProductDetail() {
                     </div>
                   )}
                   <div className="flex-1 min-w-0">
-                    <div className="font-bold text-sm truncate">{supplier.companyName || 'Verified Supplier'}</div>
+                    <Link to={`/suppliers/${supplier.id}`} className="font-bold text-sm truncate hover:text-[#00A651] hover:underline">{supplier.companyName || 'Verified Supplier'}</Link>
                     <div className="text-[11px] text-gray-500 flex items-center gap-1">
                       🌍 {supplier.country || 'Unknown'}
                       {supplier.isVerified && (

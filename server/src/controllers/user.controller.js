@@ -53,3 +53,12 @@ export async function remove(req, res, next) {
     next(err);
   }
 }
+
+export async function getPublicProfile(req, res, next) {
+  try {
+    const supplier = await userService.getPublicSupplierProfile(req.params.id);
+    res.json(supplier);
+  } catch (err) {
+    next(err);
+  }
+}

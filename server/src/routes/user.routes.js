@@ -5,6 +5,10 @@ import { requireRole } from '../middleware/roleGuard.js';
 
 const router = Router();
 
+// Public — anyone can view a supplier's profile (no auth required)
+router.get('/:id/public', userController.getPublicProfile);
+
+// All routes below require authentication + admin role
 router.use(authenticate, requireRole('ADMIN'));
 
 router.get('/', userController.list);

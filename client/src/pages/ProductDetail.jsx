@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useCart } from '../context/CartContext.jsx';
 
 export default function ProductDetail() {
   const { slug, id } = useParams();
@@ -9,6 +10,11 @@ export default function ProductDetail() {
   const [activeImg, setActiveImg] = useState(0);
   const [tab, setTab] = useState('Description');
   const [relatedProducts, setRelatedProducts] = useState([]);
+  const [quantity, setQuantity] = useState(1);
+  const [addingToCart, setAddingToCart] = useState(false);
+  const [cartMsg, setCartMsg] = useState('');
+  const { addToCart } = useCart();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const load = async () => {
@@ -218,8 +224,53 @@ export default function ProductDetail() {
                   </div>
                 </div>
 
-                <button className="w-full bg-[#00A651] hover:bg-[#008a44] text-white rounded-full py-2.5 text-sm font-bold transition">
-                  Start Order
+                {cartMsg && (
+                  <div className="bg-green-50 border border-green-200 text-green-700 text-xs px-3 py-2 rounded-lg mb-2 text-center">
+                    {cartMsg}
+                  </div>
+                )}
+
+                <div className="mb-3">
+                  <label className="block text-xs font-bold text-gray-700 mb-1">
+                    Quantity (Min. {product.minOrderQty} {product.unit})
+                  </label>
+                  <div className="flex items-center border rounded-full overflow-hidden">
+                    <button
+                      onClick={() => setQuantity(Math.max(product.minOrderQty, quantity - 1))}
+                      className="px-3 py-2 hover:bg-gray-50 text-lg font-bold"
+                    >−</button>
+                    <input
+                      type="number"
+                      min={product.minOrderQty}
+                      value={quantity}
+                      onChange={(e) => setQuantity(Math.max(product.minOrderQty, Number(e.target.value) || product.minOrderQty))}
+                      className="flex-1 text-center border-0 outline-none text-sm font-semibold"
+                    />
+                    <button
+                      onClick={() => setQuantity(quantity + 1)}
+                      className="px-3 py-2 hover:bg-gray-50 text-lg font-bold"
+                    >+</button>
+                  </div>
+                </div>
+
+                <button
+                  onClick={async () => {
+                    setCartMsg('');
+                    setAddingToCart(true);
+                    try {
+                      await addToCart(product.id, quantity);
+                      setCartMsg('Added to cart!');
+                      setTimeout(() => navigate('/cart'), 500);
+                    } catch (e) {
+                      setCartMsg('Error: ' + e.message);
+                    } finally {
+                      setAddingToCart(false);
+                    }
+                  }}
+                  disabled={addingToCart}
+                  className="w-full bg-[#00A651] hover:bg-[#008a44] disabled:opacity-60 text-white rounded-full py-2.5 text-sm font-bold transition"
+                >
+                  {addingToCart ? 'Adding...' : 'Start Order'}
                 </button>
                 <button className="w-full mt-2 border border-[#00A651] text-[#00A651] rounded-full py-2.5 text-sm font-bold hover:bg-[#00A651]/5 transition">
                   Chat with Supplier

@@ -11,5 +11,6 @@ router.use(authenticate, requireRole('BUYER', 'ADMIN'));
 router.get('/', cartController.getCart);
 router.post('/add', cartController.addItem);
 router.delete('/item/:itemId', cartController.removeItem);
+router.post('/checkout', cartController.checkout);
 
 export default router;

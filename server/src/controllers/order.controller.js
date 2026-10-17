@@ -44,3 +44,12 @@ export async function updateStatus(req, res, next) {
     next(err);
   }
 }
+
+export async function listMine(req, res, next) {
+  try {
+    const result = await orderService.listBuyerOrders(req.user.id, req.query);
+    res.json(result);
+  } catch (err) {
+    next(err);
+  }
+}

@@ -169,3 +169,45 @@ export async function updateOrderStatus(id, userId, role, data) {
 
   return updated;
 }
+
+export async function listBuyerOrders(buyerId, query) {
+  const { page = 1, limit = 20, status } = query;
+  const pageNum = Number(page) || 1;
+  const limitNum = Number(limit) || 20;
+
+  const where = { buyerId };
+  if (status) where.status = status;
+
+  const [orders, total] = await Promise.all([
+    prisma.order.findMany({
+      where,
+      include: {
+        product: {
+          select: {
+            id: true,
+            title: true,
+            slug: true,
+            images: { where: { isPrimary: true }, take: 1 },
+          },
+        },
+        supplier: {
+          select: { id: true, companyName: true, country: true },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+      skip: (pageNum - 1) * limitNum,
+      take: limitNum,
+    }),
+    prisma.order.count({ where }),
+  ]);
+
+  return {
+    orders,
+    pagination: {
+      page: pageNum,
+      limit: limitNum,
+      total,
+      totalPages: Math.ceil(total / limitNum),
+    },
+  };
+}

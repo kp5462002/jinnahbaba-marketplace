@@ -10,6 +10,7 @@ const router = Router();
 router.use(authenticate);
 
 router.get('/', validate(orderQuerySchema), orderController.list);
+router.get('/mine', orderController.listMine);
 router.post(
   '/',
   requireRole('BUYER'),

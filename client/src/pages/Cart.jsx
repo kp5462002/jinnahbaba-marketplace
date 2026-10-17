@@ -1,10 +1,14 @@
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 
 export default function Cart() {
   const { user } = useAuth();
-  const { cart, loading, itemCount, subtotal, removeItem } = useCart();
+  const { cart, loading, itemCount, subtotal, removeItem, refreshCart } = useCart();
+  const navigate = useNavigate();
+  const [checkingOut, setCheckingOut] = useState(false);
+  const [checkoutError, setCheckoutError] = useState('');
 
   if (!user) {
     return (
@@ -141,11 +145,37 @@ export default function Cart() {
                   </span>
                 </div>
 
+                {checkoutError && (
+                  <div className="bg-red-50 border border-red-200 text-red-600 text-xs px-3 py-2 rounded-lg mb-3 text-center">
+                    {checkoutError}
+                  </div>
+                )}
                 <button
-                  disabled
-                  className="w-full bg-[#00A651] disabled:opacity-60 text-white rounded-full py-2.5 text-sm font-bold cursor-not-allowed"
+                  onClick={async () => {
+                    setCheckoutError('');
+                    setCheckingOut(true);
+                    try {
+                      const token = localStorage.getItem('accessToken');
+                      const res = await fetch('/api/cart/checkout', {
+                        method: 'POST',
+                        headers: { Authorization: `Bearer ${token}` },
+                      });
+                      if (!res.ok) {
+                        const err = await res.json().catch(() => ({}));
+                        throw new Error(err.error || 'Checkout failed');
+                      }
+                      await refreshCart();
+                      navigate('/orders');
+                    } catch (e) {
+                      setCheckoutError(e.message);
+                    } finally {
+                      setCheckingOut(false);
+                    }
+                  }}
+                  disabled={checkingOut}
+                  className="w-full bg-[#00A651] hover:bg-[#008a44] disabled:opacity-60 text-white rounded-full py-2.5 text-sm font-bold transition"
                 >
-                  Checkout (Coming Soon)
+                  {checkingOut ? 'Processing...' : 'Checkout'}
                 </button>
                 <p className="text-[11px] text-gray-400 text-center mt-2">
                   Final price and shipping will be negotiated with the supplier.

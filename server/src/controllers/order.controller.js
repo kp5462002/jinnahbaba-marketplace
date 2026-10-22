@@ -22,7 +22,7 @@ export async function list(req, res, next) {
   try {
     const result = await orderService.listOrders(
       req.user.id,
-      req.query.role || req.user.role.toLowerCase(),
+      req.user.role.toLowerCase(),
       req.query
     );
     res.json(result);

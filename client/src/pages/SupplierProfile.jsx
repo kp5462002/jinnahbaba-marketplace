@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { apiFetch } from '../api/fetch.js';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 
 export default function SupplierProfile() {
@@ -16,8 +17,8 @@ export default function SupplierProfile() {
         setError(null);
 
         const [profileRes, productsRes] = await Promise.all([
-          fetch(`/api/users/${id}/public`),
-          fetch(`/api/products/supplier/${id}?limit=20`),
+          apiFetch(`/users/${id}/public`),
+          apiFetch(`/products/supplier/${id}?limit=20`),
         ]);
 
         if (!profileRes.ok) throw new Error('Supplier not found');

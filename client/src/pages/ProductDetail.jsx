@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { apiFetch } from '../api/fetch.js';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext.jsx';
 
@@ -38,7 +39,7 @@ export default function ProductDetail() {
     if (!product?.category?.slug) return;
     const loadRelated = async () => {
       try {
-        const res = await fetch(`/api/products?categorySlug=${product.category.slug}&limit=7`);
+        const res = await apiFetch(`/products?categorySlug=${product.category.slug}&limit=7`);
         if (!res.ok) return;
         const data = await res.json();
         const list = (data.products || []).filter((p) => p.id !== product.id).slice(0, 6);

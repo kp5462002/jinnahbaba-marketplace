@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { apiFetch } from '../api/fetch.js';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 
@@ -26,7 +27,7 @@ export default function Orders() {
     const load = async () => {
       try {
         const token = localStorage.getItem('accessToken');
-        const res = await fetch('/api/orders/mine', {
+        const res = await apiFetch('/orders/mine', {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) throw new Error('Failed to load orders');

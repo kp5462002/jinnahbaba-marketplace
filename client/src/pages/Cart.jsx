@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { apiFetch } from '../api/fetch.js';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -156,7 +157,7 @@ export default function Cart() {
                     setCheckingOut(true);
                     try {
                       const token = localStorage.getItem('accessToken');
-                      const res = await fetch('/api/cart/checkout', {
+                      const res = await apiFetch('/cart/checkout', {
                         method: 'POST',
                         headers: { Authorization: `Bearer ${token}` },
                       });

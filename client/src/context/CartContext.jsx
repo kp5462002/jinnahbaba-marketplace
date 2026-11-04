@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { apiFetch } from '../api/fetch.js';
 import { useAuth } from './AuthContext.jsx';
 
 const CartContext = createContext(null);
@@ -16,7 +17,7 @@ export function CartProvider({ children }) {
     }
     setLoading(true);
     try {
-      const res = await fetch('/api/cart', {
+      const res = await apiFetch('/cart', {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
@@ -44,7 +45,7 @@ export function CartProvider({ children }) {
     const token = localStorage.getItem('accessToken');
     if (!token) throw new Error('Please sign in to add items to cart');
 
-    const res = await fetch('/api/cart/add', {
+    const res = await apiFetch('/cart/add', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -65,7 +66,7 @@ export function CartProvider({ children }) {
     const token = localStorage.getItem('accessToken');
     if (!token) return;
 
-    const res = await fetch(`/api/cart/item/${itemId}`, {
+    const res = await apiFetch(`/cart/item/${itemId}`, {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${token}` },
     });

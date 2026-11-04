@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { apiFetch } from '../api/fetch.js';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 
@@ -21,7 +22,7 @@ export default function RFQCreate() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    fetch('/api/categories')
+    apiFetch('/categories')
       .then((r) => r.json())
       .then((d) => setCategories(Array.isArray(d) ? d : []))
       .catch(() => setCategories([]));
@@ -45,7 +46,7 @@ export default function RFQCreate() {
     setLoading(true);
     try {
       const token = localStorage.getItem('accessToken');
-      const res = await fetch('/api/rfqs', {
+      const res = await apiFetch('/rfqs', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

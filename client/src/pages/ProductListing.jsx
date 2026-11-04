@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { apiFetch } from '../api/fetch.js';
 import { Link, useSearchParams } from 'react-router-dom';
 
 export default function ProductListing() {
@@ -17,7 +18,7 @@ export default function ProductListing() {
   const page = parseInt(searchParams.get('page') || '1', 10);
 
   useEffect(() => {
-    fetch('/api/categories')
+    apiFetch('/categories')
       .then((r) => r.json())
       .then((data) => setCategories(Array.isArray(data) ? data : []))
       .catch(() => setCategories([]));
@@ -38,7 +39,7 @@ export default function ProductListing() {
         params.set('sortBy', sortBy);
         params.set('sortOrder', sortOrder);
 
-        const res = await fetch(`/api/products?${params.toString()}`);
+        const res = await apiFetch(`/products?${params.toString()}`);
         if (!res.ok) throw new Error('Failed to load products');
         const data = await res.json();
         setProducts(data.products || []);

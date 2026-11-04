@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { apiFetch } from '../api/fetch.js';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 
@@ -22,7 +23,7 @@ export default function RFQList() {
         }
         params.set('limit', '20');
 
-        const res = await fetch(`/api/rfqs?${params.toString()}`);
+        const res = await apiFetch(`/rfqs?${params.toString()}`);
         if (!res.ok) throw new Error('Failed to load RFQs');
         const data = await res.json();
         setRfqs(data.rfqs || []);

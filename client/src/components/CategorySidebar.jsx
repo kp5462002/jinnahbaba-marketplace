@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { apiFetch } from '../api/fetch.js';
 import { Link } from 'react-router-dom';
 
 export default function CategorySidebar() {
@@ -8,7 +9,7 @@ export default function CategorySidebar() {
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await fetch('/api/categories');
+        const res = await apiFetch('/categories');
         if (!res.ok) throw new Error('API error');
         const data = await res.json();
         setCategories(Array.isArray(data) ? data : []);

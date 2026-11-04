@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { apiFetch } from '../api/fetch.js';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 
@@ -35,7 +36,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (!user) return;
-    fetch('/api/categories').then(r => r.json()).then(d => setCategories(Array.isArray(d) ? d : [])).catch(() => {});
+    apiFetch('/categories').then(r => r.json()).then(d => setCategories(Array.isArray(d) ? d : [])).catch(() => {});
   }, [user]);
 
   const loadData = async () => {
@@ -45,8 +46,8 @@ export default function Dashboard() {
     try {
       const token = localStorage.getItem('accessToken');
       const [productsRes, ordersRes] = await Promise.all([
-        isSupplier ? fetch(`/api/products/supplier/${user.id}?limit=50`) : Promise.resolve({ json: () => ({ products: [] }) }),
-        fetch('/api/orders', { headers: { Authorization: `Bearer ${token}` } }),
+        isSupplier ? apiFetch(`/products/supplier/${user.id}?limit=50`) : Promise.resolve({ json: () => ({ products: [] }) }),
+        apiFetch('/orders', { headers: { Authorization: `Bearer ${token}` } }),
       ]);
       const productsData = await productsRes.json();
       const ordersData = await ordersRes.json();
@@ -79,7 +80,7 @@ export default function Dashboard() {
     setSubmitting(true);
     try {
       const token = localStorage.getItem('accessToken');
-      const res = await fetch('/api/products', {
+      const res = await apiFetch('/products', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -118,7 +119,7 @@ export default function Dashboard() {
   const updateOrderStatus = async (orderId, newStatus) => {
     try {
       const token = localStorage.getItem('accessToken');
-      const res = await fetch(`/api/orders/${orderId}/status`, {
+      const res = await apiFetch(`/orders/${orderId}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

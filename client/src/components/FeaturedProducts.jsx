@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { apiFetch } from '../api/fetch.js';
 import { Link } from 'react-router-dom';
 
 export default function FeaturedProducts() {
@@ -8,7 +9,7 @@ export default function FeaturedProducts() {
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await fetch('/api/products?limit=12');
+        const res = await apiFetch('/products?limit=12');
         if (!res.ok) throw new Error('API error');
         const data = await res.json();
         const list = data.products || [];

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { apiFetch } from '../api/fetch.js';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 
@@ -25,7 +26,7 @@ export default function RFQDetail() {
     try {
       setLoading(true);
       setError('');
-      const res = await fetch(`/api/rfqs/${id}`);
+      const res = await apiFetch(`/rfqs/${id}`);
       if (!res.ok) throw new Error('RFQ not found');
       const data = await res.json();
       setRfq(data);
@@ -46,7 +47,7 @@ export default function RFQDetail() {
     setSubmitting(true);
     try {
       const token = localStorage.getItem('accessToken');
-      const res = await fetch(`/api/rfqs/${id}/respond`, {
+      const res = await apiFetch(`/rfqs/${id}/respond`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

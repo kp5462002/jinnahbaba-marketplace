@@ -8,3 +8,4 @@ coverage/
 .vite/
 dist/
 dist.zip
+client/dist.zip

@@ -1,6 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
+import AdminRoute from './components/AdminRoute.jsx';
 import Home from './pages/Home.jsx';
 import ProductListing from './pages/ProductListing.jsx';
 import ProductDetail from './pages/ProductDetail.jsx';
@@ -13,6 +14,7 @@ import RFQDetail from './pages/RFQDetail.jsx';
 import SupplierProfile from './pages/SupplierProfile.jsx';
 import Cart from './pages/Cart.jsx';
 import Orders from './pages/Orders.jsx';
+import Admin from './pages/Admin.jsx';
 
 export default function App() {
   return (
@@ -36,6 +38,14 @@ export default function App() {
             <ProtectedRoute>
               <Dashboard />
             </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <Admin />
+            </AdminRoute>
           }
         />
       </Route>

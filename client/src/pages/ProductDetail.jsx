@@ -21,8 +21,8 @@ export default function ProductDetail() {
     const load = async () => {
       try {
         setLoading(true);
-        const url = slug ? `/api/products/slug/${slug}` : `/api/products/${id}`;
-        const res = await fetch(url);
+        const url = slug ? `/products/slug/${slug}` : `/products/${id}`;
+        const res = await apiFetch(url);
         if (!res.ok) throw new Error('Product not found');
         const data = await res.json();
         setProduct(data);

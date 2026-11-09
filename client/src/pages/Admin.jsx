@@ -31,17 +31,17 @@ export default function Admin() {
     setLoading(true);
     setError('');
     try {
-      const token = localStorage.getItem('accessToken');
       const [pendingRes, allRes, usersRes] = await Promise.all([
         apiFetch('/products?status=PENDING&limit=100'),
         apiFetch('/products?limit=100&status=ACTIVE'),
-        fetch(`${import.meta.env.VITE_API_URL || '/api'}/users?limit=100`, {
-          headers: { Authorization: `Bearer ${token}` },
+        fetch(`${import.meta.env.VITE_API_URL || '/api'}/users`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` },
         }),
       ]);
 
       const pendingData = await pendingRes.json();
       const allData = await allRes.json();
+
       setPending(pendingData.products || []);
       setAllProducts(allData.products || []);
 

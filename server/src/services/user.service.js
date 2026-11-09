@@ -31,7 +31,8 @@ export async function listUsers(query) {
         _count: {
           select: {
             products: true,
-            inquiries: true,
+            inquiriesSent: true,
+            inquiriesReceived: true,
             ordersAsBuyer: true,
             ordersAsSupplier: true,
           },

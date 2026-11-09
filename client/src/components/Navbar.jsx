@@ -95,6 +95,15 @@ const Navbar = () => {
                   >
                     📊 My Dashboard
                   </Link>
+                  {user?.role === 'ADMIN' && (
+                    <Link
+                      to="/admin"
+                      onClick={() => setMenuOpen(false)}
+                      className="block px-4 py-2 text-sm hover:bg-purple-50 text-purple-600 font-semibold"
+                    >
+                      🔧 Admin Panel
+                    </Link>
+                  )}
                   <Link
                     to="/cart"
                     onClick={() => setMenuOpen(false)}

@@ -117,7 +117,7 @@ export default function ProductDetail() {
         <div className="bg-white rounded-lg p-6">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             <div className="lg:col-span-5 flex gap-3">
-              <div className="flex flex-col gap-2 max-h-[460px] overflow-y-auto">
+              <div className="hidden lg:flex flex-col gap-2 max-h-[460px] overflow-y-auto">
                 {images.slice(0, 6).map((img, i) => (
                   <button
                     key={i}
@@ -287,12 +287,12 @@ export default function ProductDetail() {
         </div>
 
         <div className="bg-white rounded-lg mt-4">
-          <div className="border-b px-6 flex gap-6 text-sm">
+          <div className="border-b px-4 md:px-6 flex gap-4 md:gap-6 text-sm overflow-x-auto">
             {['Description', 'Specifications', 'Supplier', 'Reviews'].map((t) => (
               <button
                 key={t}
                 onClick={() => setTab(t)}
-                className={`py-3 border-b-2 transition ${
+                className={`py-3 border-b-2 transition whitespace-nowrap ${
                   tab === t
                     ? 'border-[#00A651] text-[#00A651] font-bold'
                     : 'border-transparent text-gray-500 hover:text-gray-700'

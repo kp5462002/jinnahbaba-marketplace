@@ -32,25 +32,25 @@ const Navbar = () => {
 
   return (
     <header className="bg-[#00A651] text-white">
-      <div className="flex justify-between items-center px-8 py-4">
+      <div className="flex justify-between items-center px-3 md:px-8 py-2 md:py-4">
         <Link to="/">
-          <img src={logoWhite} alt="Jinnahbaba.com" className="h-20 w-auto object-contain" />
+          <img src={logoWhite} alt="Jinnahbaba.com" className="h-12 md:h-20 w-auto object-contain" />
         </Link>
 
-        <div className="flex items-center gap-6 text-[13px]">
-          <div className="flex items-center gap-2 cursor-pointer hover:underline">
+        <div className="flex items-center gap-2 md:gap-6 text-[13px]">
+          <div className="hidden md:flex items-center gap-2 cursor-pointer hover:underline">
             <span>Deliver to:</span>
             <span className="flex items-center gap-1">
               <span className="text-base">🇵🇰</span> Pakistan
             </span>
           </div>
 
-          <div className="flex items-center gap-1 cursor-pointer hover:underline">
+          <div className="hidden md:flex items-center gap-1 cursor-pointer hover:underline">
             <span className="text-base">🌐</span>
             <span>English-PKR</span>
           </div>
 
-          <div className="flex items-center gap-5 ml-4 text-xl">
+          <div className="flex items-center gap-3 md:gap-5 md:ml-4 text-lg md:text-xl">
             <Link
               to="/cart"
               className="relative cursor-pointer hover:opacity-80 transition"

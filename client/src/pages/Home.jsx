@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import SearchSection from '../components/SearchSection';
 import FeaturedProducts from '../components/FeaturedProducts';
 import CategorySidebar from '../components/CategorySidebar';
+import FloatingRail from '../components/FloatingRail';
 
 export default function Home() {
   const countries = [
@@ -115,6 +116,49 @@ export default function Home() {
         </div>
       </div>
 
+      {/* ===== BROWSING HISTORY + KEEP LOOKING ===== */}
+      <div className="bg-white">
+        <div className="max-w-[1400px] mx-auto px-4 py-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="bg-gradient-to-br from-blue-50 to-white border rounded-lg p-5">
+              <h3 className="text-sm font-bold text-gray-800 mb-3">Browsing history</h3>
+              <div className="flex items-center gap-3">
+                <img src="https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=100&h=100&fit=crop" alt="" className="w-20 h-20 rounded object-cover" />
+                <div>
+                  <div className="text-sm font-semibold text-gray-800">Smart Watch</div>
+                  <div className="text-xs text-gray-500 mt-1">Just viewed</div>
+                  <div className="text-sm font-bold text-[#00A651] mt-1">$8.90 - $15.00</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white border rounded-lg p-5">
+              <h3 className="text-sm font-bold text-gray-800 mb-1">Keep looking for</h3>
+              <p className="text-xs text-gray-500 mb-3">Other Home Decor</p>
+              <div className="flex items-center gap-3">
+                <img src="https://images.unsplash.com/photo-1567696911980-2eed69a46042?w=100&h=100&fit=crop" alt="" className="w-16 h-16 rounded object-cover" />
+                <div>
+                  <div className="text-xs font-medium text-gray-700">Ceramic Set</div>
+                  <div className="text-xs font-bold text-[#00A651]">$179.73</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white border rounded-lg p-5">
+              <h3 className="text-sm font-bold text-gray-800 mb-1">Keep looking for</h3>
+              <p className="text-xs text-gray-500 mb-3">Dining Room Sets</p>
+              <div className="flex items-center gap-3">
+                <img src="https://images.unsplash.com/photo-1615873968403-89e068629265?w=100&h=100&fit=crop" alt="" className="w-16 h-16 rounded object-cover" />
+                <div>
+                  <div className="text-xs font-medium text-gray-700">Dining Set</div>
+                  <div className="text-xs font-bold text-[#00A651]">$100.00</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* ===== HERO + CATEGORY + CTA ===== */}
       <div className="max-w-[1400px] mx-auto px-4 py-6">
         <div className="flex gap-6">
@@ -167,6 +211,7 @@ export default function Home() {
       </div>
 
       <FeaturedProducts />
+      <FloatingRail />
     </div>
   );
 }

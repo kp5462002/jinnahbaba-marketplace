@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import logoWhite from "../assets/logo-white.png";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useCart } from "../context/CartContext.jsx";
+import { ShoppingCart, MessageSquare, ClipboardList, User, ChevronDown } from "lucide-react";
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -50,21 +51,25 @@ const Navbar = () => {
             <span>English-PKR</span>
           </div>
 
-          <div className="flex items-center gap-3 md:gap-5 md:ml-4 text-lg md:text-xl">
+          <div className="flex items-center gap-4 md:gap-5 md:ml-4">
             <Link
               to="/cart"
               className="relative cursor-pointer hover:opacity-80 transition"
               title="Cart"
             >
-              🛒
+              <ShoppingCart size={22} strokeWidth={1.5} />
               {itemCount > 0 && (
-                <span className="absolute -top-1 -right-2 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
                   {itemCount > 99 ? '99+' : itemCount}
                 </span>
               )}
             </Link>
-            <span className="cursor-pointer" title="Messages">💬</span>
-            <span className="cursor-pointer" title="Orders">📋</span>
+            <Link to="/rfq" className="cursor-pointer hover:opacity-80 transition" title="Messages">
+              <MessageSquare size={22} strokeWidth={1.5} />
+            </Link>
+            <Link to="/orders" className="cursor-pointer hover:opacity-80 transition" title="Orders">
+              <ClipboardList size={22} strokeWidth={1.5} />
+            </Link>
           </div>
 
           {user ? (
@@ -73,11 +78,9 @@ const Navbar = () => {
                 onClick={() => setMenuOpen((v) => !v)}
                 className="flex items-center gap-2 cursor-pointer hover:underline"
               >
-                <span className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-[11px] font-bold">
-                  {displayName[0]?.toUpperCase()}
-                </span>
-                <span className="max-w-[160px] truncate">{displayName}</span>
-                <span className="text-[10px]">▾</span>
+                <User size={22} strokeWidth={1.5} />
+                <span className="max-w-[160px] truncate hidden md:inline">{displayName}</span>
+                <ChevronDown size={14} strokeWidth={2} />
               </button>
 
               {menuOpen && (
@@ -138,14 +141,14 @@ const Navbar = () => {
         </div>
       </div>
 
-      <div className="flex justify-between items-center px-8 pb-3 text-[13px] border-t border-white/10 pt-3">
-        <div className="flex items-center gap-6">
+      <div className="flex justify-between items-center px-3 md:px-8 pb-3 text-[13px] border-t border-white/10 pt-3">
+        <div className="flex items-center gap-4 md:gap-6">
           <span className="font-bold cursor-pointer">☰ All categories</span>
-          <span className="cursor-pointer hover:underline">Featured selections</span>
-          <span className="cursor-pointer hover:underline">Order protections</span>
+          <span className="cursor-pointer hover:underline hidden sm:inline">Featured selections</span>
+          <span className="cursor-pointer hover:underline hidden sm:inline">Order protections</span>
         </div>
         <div>
-          <span className="cursor-pointer hover:underline">Buyer Central</span>
+          <span className="cursor-pointer hover:underline hidden sm:inline">Buyer Central</span>
         </div>
       </div>
     </header>

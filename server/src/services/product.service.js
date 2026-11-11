@@ -3,7 +3,7 @@ import prisma from '../utils/prisma.js';
 // BRI region groupings for filtering
 const REGIONS = {
   'Africa': ['Nigeria', 'Kenya', 'Egypt', 'South Africa', 'Ethiopia', 'Cameroon', 'Ghana', 'Morocco', 'Tanzania', 'Uganda', 'Algeria', 'Angola', 'Zambia', 'Zimbabwe', 'Mozambique', 'Senegal', 'Mali'],
-  'Europe': ['Poland', 'Hungary', 'Greece', 'Serbia', 'Belarus', 'Ukraine', 'Romania', 'Bulgaria', 'Croatia', 'Czech Republic', 'Slovak Republic', 'Slovenia', 'Lithuania', 'Latvia', 'Estonia', 'Italy', 'Portugal', 'Luxembourg', 'Austria', 'Malta', 'Cyprus', 'Montenegro', 'North Macedonia', 'Albania', 'Bosnia and Herzegovina', 'Moldova'],
+  'Europe': ['Poland', 'Hungary', 'Greece', 'Serbia', 'Belarus', 'Ukraine', 'Romania', 'Bulgaria', 'Croatia', 'Czech Republic', 'Slovak Republic', 'Slovenia', 'Lithuania', 'Latvia', 'Estonia', 'Italy', 'Portugal', 'Luxembourg', 'Austria', 'Malta', 'Cyprus', 'Montenegro', 'North Macedonia', 'Albania', 'Bosnia and Herzegovina', 'Moldova', 'Turkey'],
   'Central Asia': ['Kazakhstan', 'Uzbekistan', 'Kyrgyz Republic', 'Tajikistan', 'Turkmenistan', 'Mongolia'],
   'Middle East': ['Saudi Arabia', 'UAE', 'Iran', 'Iraq', 'Qatar', 'Kuwait', 'Oman', 'Bahrain', 'Jordan', 'Lebanon', 'Turkey'],
   'South Asia': ['Pakistan', 'India', 'Bangladesh', 'Sri Lanka', 'Nepal', 'Maldives', 'Afghanistan'],

@@ -16,6 +16,8 @@ export default function ProductListing() {
   const sortBy = searchParams.get('sort') || 'createdAt';
   const sortOrder = searchParams.get('order') || 'desc';
   const page = parseInt(searchParams.get('page') || '1', 10);
+  const country = searchParams.get('country') || '';
+  const region = searchParams.get('region') || '';
 
   useEffect(() => {
     apiFetch('/categories')
@@ -34,6 +36,8 @@ export default function ProductListing() {
         if (categorySlug) params.set('categorySlug', categorySlug);
         if (searchQuery) params.set('search', searchQuery);
         if (supplierId) params.set('supplierId', supplierId);
+        if (country) params.set('country', country);
+        if (region) params.set('region', region);
         params.set('page', String(page));
         params.set('limit', '20');
         params.set('sortBy', sortBy);
@@ -52,7 +56,7 @@ export default function ProductListing() {
       }
     };
     load();
-  }, [categorySlug, searchQuery, sortBy, sortOrder, page]);
+  }, [categorySlug, searchQuery, sortBy, sortOrder, page, country, region]);
 
   const updateParam = (key, value) => {
     const next = new URLSearchParams(searchParams);

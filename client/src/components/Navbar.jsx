@@ -38,7 +38,7 @@ const Navbar = () => {
           <img src={logoWhite} alt="Jinnahbaba.com" className="h-12 md:h-20 w-auto object-contain" />
         </Link>
 
-        <div className="flex items-center gap-2 md:gap-6 text-[13px]">
+        <div className="flex items-center gap-2 md:gap-4 text-[14px]">
           <div className="hidden md:flex items-center gap-2 cursor-pointer hover:underline">
             <span>Deliver to:</span>
             <span className="flex items-center gap-1">
@@ -51,7 +51,7 @@ const Navbar = () => {
             <span>English-PKR</span>
           </div>
 
-          <div className="flex items-center gap-4 md:gap-5 md:ml-4">
+          <div className="flex items-center gap-3 md:gap-4">
             <Link
               to="/cart"
               className="relative cursor-pointer hover:opacity-80 transition"
@@ -134,7 +134,7 @@ const Navbar = () => {
               )}
             </div>
           ) : (
-            <Link to="/login" className="hover:underline ml-2">
+            <Link to="/login" className="font-bold hover:opacity-80 px-2 py-1">
               Sign In
             </Link>
           )}

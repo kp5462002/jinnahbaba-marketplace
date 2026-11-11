@@ -1,5 +1,17 @@
 import prisma from '../utils/prisma.js';
 
+// BRI region groupings for filtering
+const REGIONS = {
+  'Africa': ['Nigeria', 'Kenya', 'Egypt', 'South Africa', 'Ethiopia', 'Cameroon', 'Ghana', 'Morocco', 'Tanzania', 'Uganda', 'Algeria', 'Angola', 'Zambia', 'Zimbabwe', 'Mozambique', 'Senegal', 'Mali'],
+  'Europe': ['Poland', 'Hungary', 'Greece', 'Serbia', 'Belarus', 'Ukraine', 'Romania', 'Bulgaria', 'Croatia', 'Czech Republic', 'Slovak Republic', 'Slovenia', 'Lithuania', 'Latvia', 'Estonia', 'Italy', 'Portugal', 'Luxembourg', 'Austria', 'Malta', 'Cyprus', 'Montenegro', 'North Macedonia', 'Albania', 'Bosnia and Herzegovina', 'Moldova'],
+  'Central Asia': ['Kazakhstan', 'Uzbekistan', 'Kyrgyz Republic', 'Tajikistan', 'Turkmenistan', 'Mongolia'],
+  'Middle East': ['Saudi Arabia', 'UAE', 'Iran', 'Iraq', 'Qatar', 'Kuwait', 'Oman', 'Bahrain', 'Jordan', 'Lebanon', 'Turkey'],
+  'South Asia': ['Pakistan', 'India', 'Bangladesh', 'Sri Lanka', 'Nepal', 'Maldives', 'Afghanistan'],
+  'Southeast Asia': ['Indonesia', 'Vietnam', 'Thailand', 'Malaysia', 'Philippines', 'Cambodia', 'Laos', 'Myanmar', 'Singapore'],
+  'East Asia': ['China', 'Korea, Rep.', 'Japan'],
+  'Latin America': ['Chile', 'Costa Rica', 'Guyana', 'Colombia', 'Peru', 'Argentina', 'Brazil', 'Bolivia', 'Ecuador', 'Venezuela, RB', 'Dominican Republic', 'Panama', 'Suriname', 'Uruguay', 'Jamaica', 'Barbados', 'Trinidad and Tobago', 'Cuba', 'El Salvador', 'Honduras', 'Nicaragua', 'Antigua and Barbuda', 'Dominica', 'Grenada'],
+};
+
 function slugify(text) {
   return text
     .toString()
@@ -114,6 +126,8 @@ export async function listProducts(query) {
     status = 'ACTIVE',
     sortBy = 'createdAt',
     sortOrder = 'desc',
+    country,
+    region,
   } = query;
 
   const where = { status };
@@ -128,6 +142,13 @@ export async function listProducts(query) {
   if (categoryId) where.categoryId = categoryId;
   if (categorySlug) where.category = { slug: categorySlug };
   if (supplierId) where.supplierId = supplierId;
+
+  if (country) {
+    where.supplier = { ...(where.supplier || {}), country };
+  }
+  if (region && REGIONS[region]) {
+    where.supplier = { ...(where.supplier || {}), country: { in: REGIONS[region] } };
+  }
 
   if (minPrice !== undefined || maxPrice !== undefined) {
     where.AND = where.AND || [];

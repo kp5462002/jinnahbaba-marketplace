@@ -24,6 +24,7 @@ export default function Dashboard() {
   const [error, setError] = useState('');
 
   const [showAddProduct, setShowAddProduct] = useState(false);
+  const [editingProductId, setEditingProductId] = useState(null);
   const [categories, setCategories] = useState([]);
   const [productForm, setProductForm] = useState({
     title: '', description: '', shortDesc: '', priceMin: '', priceMax: '',
@@ -80,8 +81,11 @@ export default function Dashboard() {
     setSubmitting(true);
     try {
       const token = localStorage.getItem('accessToken');
-      const res = await apiFetch('/products', {
-        method: 'POST',
+      const isEditing = !!editingProductId;
+      const url = isEditing ? `/products/${editingProductId}` : '/products';
+      
+      const res = await apiFetch(url, {
+        method: isEditing ? 'PUT' : 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
@@ -104,6 +108,7 @@ export default function Dashboard() {
         throw new Error(err.error || 'Failed to create product');
       }
       setShowAddProduct(false);
+      setEditingProductId(null);
       setProductForm({
         title: '', description: '', shortDesc: '', priceMin: '', priceMax: '',
         minOrderQty: 100, unit: 'piece', categoryId: '', imageUrl: '',
@@ -114,6 +119,46 @@ export default function Dashboard() {
     } finally {
       setSubmitting(false);
     }
+  };
+
+
+  const handleDelete = async (productId) => {
+    if (!window.confirm('Are you sure you want to delete this product? This action cannot be undone.')) return;
+    
+    try {
+      const token = localStorage.getItem('accessToken');
+      const res = await apiFetch(`/products/${productId}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || 'Failed to delete product');
+      }
+      
+      setProducts(prev => prev.filter(p => p.id !== productId));
+      setStats(prev => ({ ...prev, products: prev.products - 1 }));
+      
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const handleEditClick = (product) => {
+    setEditingProductId(product.id);
+    setProductForm({
+      title: product.title || '',
+      description: product.description || '',
+      shortDesc: product.shortDesc || '',
+      priceMin: product.priceMin?.toString() || '',
+      priceMax: product.priceMax?.toString() || '',
+      minOrderQty: product.minOrderQty || 100,
+      unit: product.unit || 'piece',
+      categoryId: product.categoryId || '',
+      imageUrl: product.images?.[0]?.url || '',
+    });
+    setShowAddProduct(true);
   };
 
   const updateOrderStatus = async (orderId, newStatus) => {
@@ -304,12 +349,29 @@ export default function Dashboard() {
                             </td>
                             <td className="py-2 px-2">{p.stockQty}</td>
                             <td className="py-2 px-2 text-right">
-                              <Link
-                                to={`/products/slug/${p.slug}`}
-                                className="text-xs text-[#00A651] hover:underline"
-                              >
-                                View
-                              </Link>
+                              <div className="flex items-center justify-end gap-2">
+                                <Link
+                                  to={`/products/slug/${p.slug}`}
+                                  className="text-xs text-gray-500 hover:text-[#00A651] px-2"
+                                  title="View"
+                                >
+                                  View
+                                </Link>
+                                <button
+                                  onClick={() => handleEditClick(p)}
+                                  className="text-xs text-blue-600 hover:text-blue-800 px-2"
+                                  title="Edit"
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  onClick={() => handleDelete(p.id)}
+                                  className="text-xs text-red-600 hover:text-red-800 px-2"
+                                  title="Delete"
+                                >
+                                  Delete
+                                </button>
+                              </div>
                             </td>
                           </tr>
                         ))}
@@ -381,7 +443,7 @@ export default function Dashboard() {
           <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-bold">Add New Product</h2>
+                <h2 className="text-lg font-bold">{editingProductId ? 'Edit Product' : 'Add New Product'}</h2>
                 <button
                   onClick={() => setShowAddProduct(false)}
                   className="text-gray-400 hover:text-gray-600 text-2xl leading-none"
@@ -501,7 +563,7 @@ export default function Dashboard() {
                     disabled={submitting}
                     className="bg-[#00A651] hover:bg-[#008a44] disabled:opacity-60 text-white px-6 py-2 rounded-full text-sm font-bold"
                   >
-                    {submitting ? 'Creating...' : 'Create Product'}
+                    {submitting ? 'Saving...' : (editingProductId ? 'Update Product' : 'Create Product')}
                   </button>
                   <button
                     type="button"

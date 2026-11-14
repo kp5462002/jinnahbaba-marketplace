@@ -1,4 +1,5 @@
 import prisma from '../utils/prisma.js';
+import { notifyOrderCreated } from './notification.service.js';
 
 // ─── Get or Create Active Cart ──────────────────────────────────────
 export async function getOrCreateCart(userId) {
@@ -159,6 +160,10 @@ export async function checkoutCart(userId) {
     });
 
     return created;
+  });
+
+  orders.forEach(order => {
+    notifyOrderCreated(order.id).catch(err => console.error('[checkout] notify error:', err.message));
   });
 
   return { orders };

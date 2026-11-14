@@ -1,4 +1,5 @@
 import prisma from '../utils/prisma.js';
+import { notifyOrderCreated } from './notification.service.js';
 
 function generateOrderNumber() {
   const timestamp = Date.now().toString(36).toUpperCase();
@@ -55,6 +56,7 @@ export async function createOrder(buyerId, data) {
     },
   });
 
+  notifyOrderCreated(order.id).catch(err => console.error('[order] notify error:', err.message));
   return order;
 }
 

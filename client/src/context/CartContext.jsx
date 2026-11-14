@@ -76,6 +76,11 @@ export function CartProvider({ children }) {
     }
   };
 
+  const clearCart = () => {
+    setCart({ items: [] });
+    fetchCart();
+  };
+
   const itemCount = cart?.items?.reduce((sum, i) => sum + i.quantity, 0) || 0;
   const subtotal = cart?.items?.reduce(
     (sum, i) => sum + i.quantity * i.product.priceMin,
@@ -84,7 +89,7 @@ export function CartProvider({ children }) {
 
   return (
     <CartContext.Provider
-      value={{ cart, loading, itemCount, subtotal, addToCart, removeItem, refreshCart: fetchCart }}
+      value={{ cart, loading, itemCount, subtotal, addToCart, removeItem, clearCart, refreshCart: fetchCart }}
     >
       {children}
     </CartContext.Provider>

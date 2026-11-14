@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 
 export default function Cart() {
   const { user } = useAuth();
-  const { cart, loading, itemCount, subtotal, removeItem, refreshCart } = useCart();
+  const { cart, loading, itemCount, subtotal, removeItem, clearCart, refreshCart } = useCart();
   const navigate = useNavigate();
   const [checkingOut, setCheckingOut] = useState(false);
   const [checkoutError, setCheckoutError] = useState('');
@@ -165,6 +165,7 @@ export default function Cart() {
                         const err = await res.json().catch(() => ({}));
                         throw new Error(err.error || 'Checkout failed');
                       }
+                      clearCart();
                       await refreshCart();
                       navigate('/orders');
                     } catch (e) {

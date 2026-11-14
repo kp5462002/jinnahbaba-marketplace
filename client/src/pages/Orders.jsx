@@ -108,9 +108,10 @@ export default function Orders() {
               const statusStyle = STATUS_STYLES[order.status] || 'bg-gray-100 text-gray-600';
 
               return (
-                <div
+                <Link
+                  to={`/orders/${order.id}`}
                   key={order.id}
-                  className="bg-white rounded-lg border p-4 hover:shadow-md transition"
+                  className="block bg-white rounded-lg border p-4 hover:shadow-md hover:border-[#00A651] transition"
                 >
                   {/* Header row */}
                   <div className="flex items-center justify-between flex-wrap gap-2 pb-3 border-b">
@@ -133,20 +134,17 @@ export default function Orders() {
 
                   {/* Body */}
                   <div className="flex gap-4 pt-3">
-                    <Link to={`/products/slug/${order.product?.slug}`} className="shrink-0">
+                    <div className="shrink-0">
                       <img
                         src={image}
                         alt={order.product?.title}
                         className="w-20 h-20 object-cover rounded-lg border"
                       />
-                    </Link>
+                    </div>
                     <div className="flex-1 min-w-0">
-                      <Link
-                        to={`/products/slug/${order.product?.slug}`}
-                        className="font-semibold text-sm hover:text-[#00A651] line-clamp-2"
-                      >
+                      <div className="font-semibold text-sm line-clamp-2">
                         {order.product?.title || 'Product'}
-                      </Link>
+                      </div>
                       <div className="text-xs text-gray-500 mt-1">
                         Supplier: {order.supplier?.companyName || '—'} • {order.supplier?.country}
                       </div>
@@ -163,7 +161,12 @@ export default function Orders() {
                       <div className="text-[10px] text-gray-400">{order.currency}</div>
                     </div>
                   </div>
-                </div>
+                  <div className="text-right mt-3 pt-3 border-t">
+                    <span className="text-xs font-bold text-[#00A651] group-hover:underline">
+                      View Details →
+                    </span>
+                  </div>
+                </Link>
               );
             })}
           </div>

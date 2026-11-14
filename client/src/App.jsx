@@ -14,6 +14,7 @@ import RFQDetail from './pages/RFQDetail.jsx';
 import SupplierProfile from './pages/SupplierProfile.jsx';
 import Cart from './pages/Cart.jsx';
 import Orders from './pages/Orders.jsx';
+import OrderDetail from './pages/OrderDetail.jsx';
 import Admin from './pages/Admin.jsx';
 
 export default function App() {
@@ -32,6 +33,14 @@ export default function App() {
         <Route path="/suppliers/:id" element={<SupplierProfile />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/orders" element={<Orders />} />
+        <Route
+          path="/orders/:id"
+          element={
+            <ProtectedRoute>
+              <OrderDetail />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/dashboard"
           element={

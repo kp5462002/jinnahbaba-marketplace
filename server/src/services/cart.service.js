@@ -153,6 +153,11 @@ export async function checkoutCart(userId) {
       data: { status: 'CHECKED_OUT' },
     });
 
+    // 🔑 Create a fresh ACTIVE cart so the next add-to-cart works immediately
+    await tx.cart.create({
+      data: { userId, status: 'ACTIVE' },
+    });
+
     return created;
   });
 

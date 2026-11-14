@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { api } from '../api/client.js';
+import { apiFetch } from '../api/fetch.js';
 
 const AuthContext = createContext(null);
 
@@ -10,8 +10,13 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const token = localStorage.getItem('accessToken');
     if (token) {
-      api
-        .get('/auth/me')
+      apiFetch('/auth/me', {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then((res) => {
+          if (!res.ok) throw new Error('Invalid token');
+          return res.json();
+        })
         .then(setUser)
         .catch(() => {
           localStorage.removeItem('accessToken');
@@ -24,7 +29,16 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = async (email, password) => {
-    const data = await api.post('/auth/login', { email, password });
+    const res = await apiFetch('/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Login failed');
+    }
+    const data = await res.json();
     localStorage.setItem('accessToken', data.accessToken);
     localStorage.setItem('refreshToken', data.refreshToken);
     setUser(data.user);
@@ -32,7 +46,16 @@ export function AuthProvider({ children }) {
   };
 
   const register = async (userData) => {
-    const data = await api.post('/auth/register', userData);
+    const res = await apiFetch('/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(userData),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || 'Registration failed');
+    }
+    const data = await res.json();
     localStorage.setItem('accessToken', data.accessToken);
     localStorage.setItem('refreshToken', data.refreshToken);
     setUser(data.user);

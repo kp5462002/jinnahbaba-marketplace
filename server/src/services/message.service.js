@@ -1,107 +1,88 @@
 import prisma from '../utils/prisma.js';
 import { emitToOrder, emitToUser } from '../utils/socket.js';
 
-export async function createMessage(senderId, data) {
+// ─── Check user is a participant in the order ──────────────────────
+async function assertParticipant(orderId, userId) {
   const order = await prisma.order.findUnique({
-    where: { id: data.orderId },
+    where: { id: orderId },
+    select: { buyerId: true, supplierId: true, orderNumber: true },
   });
-
   if (!order) {
-    const err = new Error('Order not found');
-    err.status = 404;
-    throw err;
+    const err = new Error('Order not found'); err.status = 404; throw err;
+  }
+  if (order.buyerId !== userId && order.supplierId !== userId) {
+    const err = new Error('Not a participant in this order'); err.status = 403; throw err;
+  }
+  return order;
+}
+
+// ─── Send a message ─────────────────────────────────────────────────
+export async function sendMessage(orderId, senderId, content) {
+  if (!content || !content.trim()) {
+    const err = new Error('Message content required'); err.status = 400; throw err;
   }
 
-  // Only buyer or supplier of the order can send messages
-  if (order.buyerId !== senderId && order.supplierId !== senderId) {
-    const err = new Error('Not authorized to send messages for this order');
-    err.status = 403;
-    throw err;
-  }
+  const order = await assertParticipant(orderId, senderId);
 
   const message = await prisma.message.create({
     data: {
-      orderId: data.orderId,
+      orderId,
       senderId,
-      content: data.content,
+      content: content.trim(),
     },
     include: {
-      sender: { select: { id: true, companyName: true, contactName: true } },
+      sender: { select: { id: true, companyName: true, contactName: true, role: true } },
     },
   });
 
-  // Emit real-time event to order participants
-  emitToOrder(data.orderId, 'new_message', message);
+  // Emit to everyone in the order room (including sender for confirmation)
+  emitToOrder(orderId, 'new_message', message);
 
-  // Notify the other participant
+  // Notify the *other* party (so their navbar badge updates)
   const recipientId = order.buyerId === senderId ? order.supplierId : order.buyerId;
-  emitToUser(recipientId, 'new_message_notification', {
-    orderId: data.orderId,
+  emitToUser(recipientId, 'message_notification', {
+    orderId,
+    orderNumber: order.orderNumber,
     message,
   });
 
   return message;
 }
 
-export async function getMessagesByOrder(orderId, userId, query) {
-  const { page = 1, limit = 50 } = query;
+// ─── List messages for an order ─────────────────────────────────────
+export async function listMessages(orderId, userId, { markRead = false } = {}) {
+  await assertParticipant(orderId, userId);
 
-  const order = await prisma.order.findUnique({
-    where: { id: orderId },
+  const messages = await prisma.message.findMany({
+    where: { orderId },
+    orderBy: { createdAt: 'asc' },
+    include: {
+      sender: { select: { id: true, companyName: true, contactName: true, role: true } },
+    },
   });
 
-  if (!order) {
-    const err = new Error('Order not found');
-    err.status = 404;
-    throw err;
+  // Mark incoming messages as read
+  if (markRead) {
+    await prisma.message.updateMany({
+      where: { orderId, senderId: { not: userId }, isRead: false },
+      data: { isRead: true },
+    });
   }
 
-  // Only buyer or supplier of the order can view messages
-  if (order.buyerId !== userId && order.supplierId !== userId) {
-    const err = new Error('Not authorized to view messages for this order');
-    err.status = 403;
-    throw err;
-  }
-
-  const [messages, total] = await Promise.all([
-    prisma.message.findMany({
-      where: { orderId },
-      include: {
-        sender: { select: { id: true, companyName: true, contactName: true } },
-      },
-      orderBy: { createdAt: 'asc' },
-      skip: (page - 1) * limit,
-      take: limit,
-    }),
-    prisma.message.count({ where: { orderId } }),
-  ]);
-
-  return {
-    messages,
-    pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
-  };
+  return messages;
 }
 
-export async function markMessagesAsRead(orderId, userId) {
-  await prisma.message.updateMany({
+// ─── Unread count for a user across all their orders ────────────────
+export async function getUnreadCount(userId) {
+  // Count messages in orders where user is a participant and message not from user and not read
+  const count = await prisma.message.count({
     where: {
-      orderId,
+      isRead: false,
       senderId: { not: userId },
-      readAt: null,
+      order: {
+        OR: [{ buyerId: userId }, { supplierId: userId }],
+      },
     },
-    data: { readAt: new Date() },
   });
-
-  // Notify sender that messages were read
-  const order = await prisma.order.findUnique({
-    where: { id: orderId },
-    select: { buyerId: true, supplierId: true },
-  });
-
-  if (order) {
-    const otherPartyId = order.buyerId === userId ? order.supplierId : order.buyerId;
-    emitToUser(otherPartyId, 'messages_read', { orderId, readBy: userId });
-  }
-
-  return { message: 'Messages marked as read' };
+  return count;
 }

@@ -273,8 +273,11 @@ export default function ProductDetail() {
                 >
                   {addingToCart ? 'Adding...' : 'Start Order'}
                 </button>
-                <button className="w-full mt-2 border border-[#00A651] text-[#00A651] rounded-full py-2.5 text-sm font-bold hover:bg-[#00A651]/5 transition">
-                  Chat with Supplier
+                <button
+                  onClick={() => navigate(`/rfq/new?productId=${product.id}&supplierId=${product.supplierId}`)}
+                  className="w-full mt-2 border border-[#00A651] text-[#00A651] rounded-full py-2.5 text-sm font-bold hover:bg-[#00A651]/5 transition"
+                >
+                  Request Quote
                 </button>
 
                 <div className="text-[11px] text-gray-500 mt-3 space-y-1">

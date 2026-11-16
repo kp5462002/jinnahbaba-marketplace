@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { apiFetch } from '../api/fetch.js';
+import ChatPanel from '../components/ChatPanel.jsx';
 import { ArrowLeft, Package, MapPin, User, CheckCircle2, Circle } from 'lucide-react';
 
 const STATUS_STEPS = ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED'];
@@ -141,6 +142,10 @@ export default function OrderDetail() {
               <p className="text-sm text-gray-600">{order.shippingAddress || 'No shipping address provided.'}</p>
             </div>
           </div>
+        </div>
+
+        <div className="mt-6">
+          <ChatPanel orderId={order.id} />
         </div>
       </div>
     </div>

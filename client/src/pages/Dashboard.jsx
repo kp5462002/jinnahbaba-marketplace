@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { apiFetch } from '../api/fetch.js';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 
 const ORDER_STATUSES = ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED'];
@@ -16,6 +16,7 @@ const STATUS_COLORS = {
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [tab, setTab] = useState('overview');
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
@@ -393,7 +394,11 @@ export default function Dashboard() {
                 ) : (
                   <div className="space-y-3">
                     {orders.map((o) => (
-                      <div key={o.id} className="border rounded-lg p-3">
+                      <div
+                        key={o.id}
+                        onClick={() => navigate(`/orders/${o.id}`)}
+                        className="border rounded-lg p-3 cursor-pointer hover:border-[#00A651] hover:shadow-sm transition"
+                      >
                         <div className="flex items-center justify-between flex-wrap gap-2 mb-2">
                           <div>
                             <span className="text-xs font-mono text-gray-500">{o.orderNumber}</span>
@@ -418,7 +423,8 @@ export default function Dashboard() {
                           {isSupplier && (
                             <select
                               value={o.status}
-                              onChange={(e) => updateOrderStatus(o.id, e.target.value)}
+                              onClick={(e) => e.stopPropagation()}
+                              onChange={(e) => { e.stopPropagation(); updateOrderStatus(o.id, e.target.value); }}
                               className="text-xs border rounded px-2 py-1"
                             >
                               {ORDER_STATUSES.map((s) => (
@@ -426,6 +432,9 @@ export default function Dashboard() {
                               ))}
                             </select>
                           )}
+                        </div>
+                        <div className="mt-2 pt-2 border-t flex justify-end">
+                          <span className="text-xs font-bold text-[#00A651]">View Details & Chat →</span>
                         </div>
                       </div>
                     ))}

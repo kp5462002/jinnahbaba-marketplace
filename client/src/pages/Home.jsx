@@ -6,20 +6,20 @@ import FloatingRail from '../components/FloatingRail';
 
 export default function Home() {
   const countries = [
-    { name: 'All', flag: '🌍', path: '/products' },
-    { name: 'China', flag: '🇨🇳', path: '/products?country=China' },
-    { name: 'Pakistan', flag: '🇵🇰', path: '/products?country=Pakistan' },
-    { name: 'India', flag: '🇮🇳', path: '/products?country=India' },
-    { name: 'Turkey', flag: '🇹🇷', path: '/products?country=Turkey' },
-    { name: 'UAE', flag: '🇦🇪', path: '/products?country=United Arab Emirates' },
-    { name: 'Saudi Arabia', flag: '🇸🇦', path: '/products?country=Saudi Arabia' },
-    { name: 'Indonesia', flag: '🇮🇩', path: '/products?country=Indonesia' },
-    { name: 'Vietnam', flag: '🇻🇳', path: '/products?country=Vietnam' },
-    { name: 'Kazakhstan', flag: '🇰🇿', path: '/products?country=Kazakhstan' },
-    { name: 'Uzbekistan', flag: '🇺🇿', path: '/products?country=Uzbekistan' },
-    { name: 'Russia', flag: '🇷🇺', path: '/products?country=Russia' },
-    { name: 'Africa', flag: '🌍', path: '/products?region=Africa' },
-    { name: 'Europe', flag: '🇪🇺', path: '/products?region=Europe' },
+    { name: 'All', flag: null, path: '/products' },
+    { name: 'China', flag: 'cn', path: '/products?country=China' },
+    { name: 'Pakistan', flag: 'pk', path: '/products?country=Pakistan' },
+    { name: 'India', flag: 'in', path: '/products?country=India' },
+    { name: 'Turkey', flag: 'tr', path: '/products?country=Turkey' },
+    { name: 'UAE', flag: 'ae', path: '/products?country=United Arab Emirates' },
+    { name: 'Saudi Arabia', flag: 'sa', path: '/products?country=Saudi Arabia' },
+    { name: 'Indonesia', flag: 'id', path: '/products?country=Indonesia' },
+    { name: 'Vietnam', flag: 'vn', path: '/products?country=Vietnam' },
+    { name: 'Kazakhstan', flag: 'kz', path: '/products?country=Kazakhstan' },
+    { name: 'Uzbekistan', flag: 'uz', path: '/products?country=Uzbekistan' },
+    { name: 'Russia', flag: 'ru', path: '/products?country=Russia' },
+    { name: 'Africa', flag: null, path: '/products?region=Africa' },
+    { name: 'Europe', flag: 'eu', path: '/products?region=Europe' },
   ];
 
   const industryHubs = [
@@ -71,8 +71,12 @@ export default function Home() {
                 to={country.path}
                 className="flex flex-col items-center gap-2 shrink-0 group"
               >
-                <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-gray-100 border-2 border-transparent group-hover:border-[#00A651] flex items-center justify-center text-2xl md:text-3xl transition">
-                  country.flag ? <span className={`fi fi-${country.flag} w-10 h-10 block`} style={{backgroundSize: 'cover'}}></span> : <span className='text-2xl'>🌍</span>
+                <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-gray-100 border-2 border-transparent group-hover:border-[#00A651] flex items-center justify-center text-2xl md:text-3xl transition overflow-hidden">
+                  {country.flag ? (
+                    <span className={`fi fi-${country.flag} w-10 h-10 block`} style={{ backgroundSize: 'cover' }}></span>
+                  ) : (
+                    <span className="text-2xl">🌍</span>
+                  )}
                 </div>
                 <span className="text-[11px] md:text-xs font-medium text-gray-700 group-hover:text-[#00A651] transition text-center max-w-[80px] leading-tight">
                   {country.name}

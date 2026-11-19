@@ -72,7 +72,7 @@ export default function Home() {
                 className="flex flex-col items-center gap-2 shrink-0 group"
               >
                 <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-gray-100 border-2 border-transparent group-hover:border-[#00A651] flex items-center justify-center text-2xl md:text-3xl transition">
-                  {country.flag}
+                  country.flag ? <span className={`fi fi-${country.flag} w-10 h-10 block`} style={{backgroundSize: 'cover'}}></span> : <span className='text-2xl'>🌍</span>
                 </div>
                 <span className="text-[11px] md:text-xs font-medium text-gray-700 group-hover:text-[#00A651] transition text-center max-w-[80px] leading-tight">
                   {country.name}

@@ -71,11 +71,12 @@ export default function Home() {
                 to={country.path}
                 className="flex flex-col items-center gap-2 shrink-0 group"
               >
-                <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-gray-100 border-2 border-transparent group-hover:border-[#00A651] flex items-center justify-center text-2xl md:text-3xl transition overflow-hidden">
+                {/* Fixed: Perfect circle container with overflow hidden and centered flag */}
+                <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-gray-100 border border-gray-200 group-hover:border-[#00A651] flex items-center justify-center transition overflow-hidden">
                   {country.flag ? (
-                    <span className={`fi fi-${country.flag} w-10 h-10 block`} style={{ backgroundSize: 'cover' }}></span>
+                    <span className={`fi fi-${country.flag} w-full h-full block`} style={{ backgroundSize: 'cover', backgroundPosition: 'center' }}></span>
                   ) : (
-                    <span className="text-2xl">🌍</span>
+                    <span className="text-xl md:text-2xl">🌍</span>
                   )}
                 </div>
                 <span className="text-[11px] md:text-xs font-medium text-gray-700 group-hover:text-[#00A651] transition text-center max-w-[80px] leading-tight">

@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { apiFetch } from '../api/fetch.js';
 import ChatPanel from '../components/ChatPanel.jsx';
-import { ArrowLeft, Package, MapPin, User, CheckCircle2, Circle } from 'lucide-react';
+import { useAuth } from '../context/AuthContext.jsx';
+import { ArrowLeft, Package, MapPin, User, CheckCircle2, Circle, CreditCard } from 'lucide-react';
 
 const STATUS_STEPS = ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED'];
 const STATUS_COLORS = {
@@ -13,14 +14,19 @@ const STATUS_COLORS = {
   DELIVERED: 'bg-green-100 text-green-700',
   CANCELLED: 'bg-gray-100 text-gray-600',
   DISPUTED: 'bg-red-100 text-red-700',
+  PAID: 'bg-green-100 text-green-700',
 };
 
 export default function OrderDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
+
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [paying, setPaying] = useState(false);
+  const [payError, setPayError] = useState('');
 
   useEffect(() => {
     const fetchOrder = async () => {
@@ -40,6 +46,28 @@ export default function OrderDetail() {
     };
     fetchOrder();
   }, [id]);
+
+  const handlePay = async () => {
+    if (!order) return;
+    setPayError('');
+    setPaying(true);
+    try {
+      const token = localStorage.getItem('accessToken');
+      const res = await apiFetch(`/payments/checkout/${order.id}`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || 'Failed to create payment');
+      }
+      const data = await res.json();
+      window.location.href = data.url;
+    } catch (err) {
+      setPayError(err.message);
+      setPaying(false);
+    }
+  };
 
   if (loading) return <div className="min-h-screen flex items-center justify-center text-gray-500">Loading order...</div>;
   if (error) return <div className="min-h-screen flex flex-col items-center justify-center"><p className="text-red-500 mb-4">{error}</p><button onClick={() => navigate(-1)} className="text-[#00A651] underline">Go Back</button></div>;
@@ -68,7 +96,6 @@ export default function OrderDetail() {
             </div>
           </div>
 
-          {/* Timeline */}
           {!isTerminated ? (
             <div className="flex items-center justify-between w-full mt-8 mb-4 relative">
               <div className="absolute left-0 top-1/2 transform -translate-y-1/2 w-full h-1 bg-gray-200 -z-0"></div>
@@ -88,10 +115,27 @@ export default function OrderDetail() {
               <p className="text-sm">This order is no longer active.</p>
             </div>
           )}
+
+          {order.status === 'PENDING' && user?.id === order.buyerId && (
+            <div className="mt-4 pt-4 border-t">
+              {payError && (
+                <div className="bg-red-50 border border-red-200 text-red-600 text-sm px-3 py-2 rounded-lg mb-2">
+                  {payError}
+                </div>
+              )}
+              <button
+                onClick={handlePay}
+                disabled={paying}
+                className="bg-[#00A651] hover:bg-[#008a44] disabled:opacity-60 text-white px-6 py-2.5 rounded-full text-sm font-bold inline-flex items-center gap-2"
+              >
+                <CreditCard size={16} />
+                {paying ? 'Redirecting to Stripe...' : `Pay Now $${order.totalAmount.toFixed(2)}`}
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column */}
           <div className="lg:col-span-2 space-y-6">
             <div className="bg-white rounded-xl border p-6">
               <h2 className="font-bold text-lg mb-4 flex items-center gap-2"><Package size={20} className="text-[#00A651]" /> Product Details</h2>
@@ -119,7 +163,6 @@ export default function OrderDetail() {
             )}
           </div>
 
-          {/* Right Column */}
           <div className="space-y-6">
             <div className="bg-white rounded-xl border p-6">
               <h2 className="font-bold text-lg mb-4 flex items-center gap-2"><User size={20} className="text-[#00A651]" /> Parties Involved</h2>
